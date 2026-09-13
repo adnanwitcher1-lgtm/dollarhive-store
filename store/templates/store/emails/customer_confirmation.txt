@@ -1,0 +1,20 @@
+Hi {{ order.customer_name }},
+
+Thanks for shopping with SK Mart — Smart Deals. More Savings. 🐝
+
+Your order #{{ order.pk }} is confirmed:
+
+{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} @ ${{ item.price }} = ${{ item.line_total }}
+{% endfor %}
+Order Total: ${{ order.order_total }}
+
+Shipping to:
+{{ order.customer_name }}
+{{ order.shipping_address }}
+{{ order.shipping_city }}, {{ order.shipping_country }}
+
+We'll email you again as soon as your order ships. You can track your
+order anytime from the "Track Order" page on SK Mart.
+
+Thanks again for choosing SK Mart!
+— The SK Mart Team

@@ -1,0 +1,60 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Your Cart — SK Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <h1 class="text-2xl font-bold text-charcoal mb-6">Your Cart</h1>
+
+  {% if cart|length == 0 %}
+  <div class="text-center py-16">
+    <p class="text-5xl mb-4">🛒</p>
+    <p class="text-gray-500 mb-6">Your cart is empty.</p>
+    <a href="{% url 'store:products' %}" class="dh-btn-primary px-6 py-3">Start Shopping →</a>
+  </div>
+  {% else %}
+  <div class="space-y-4">
+    {% for item in cart %}
+    <div class="dh-cart-row">
+      <div class="flex items-center gap-4">
+        {% if item.product.image %}
+        <img src="{{ item.product.image.url }}" class="w-16 h-16 rounded-lg object-cover" alt="{{ item.product.name }}">
+        {% else %}
+        <div class="w-16 h-16 rounded-lg bg-cream flex items-center justify-center text-2xl">📦</div>
+        {% endif %}
+        <div>
+          <a href="{{ item.product.get_absolute_url }}" class="font-semibold text-charcoal hover:text-gold">{{ item.product.name }}</a>
+          <p class="text-sm text-gray-500">${{ item.product.price }} each</p>
+        </div>
+      </div>
+
+      <form action="{% url 'store:cart_update' item.product.id %}" method="post" class="flex items-center gap-2">
+        {% csrf_token %}
+        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="dh-input w-16 text-center" onchange="this.form.submit()">
+      </form>
+
+      <span class="font-semibold text-charcoal w-20 text-right">${{ item.line_total }}</span>
+
+      <form action="{% url 'store:cart_remove' item.product.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="text-gray-400 hover:text-red-500" aria-label="Remove item">✕</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="dh-cart-summary mt-8 ml-auto">
+    <div class="flex justify-between text-gray-500 text-sm mb-2">
+      <span>Subtotal ({{ cart.total_quantity }} items)</span>
+      <span>${{ cart.total_price }}</span>
+    </div>
+    <div class="flex justify-between text-xl font-bold text-charcoal mb-5">
+      <span>Total</span>
+      <span>${{ cart.total_price }}</span>
+    </div>
+    <a href="{% url 'store:checkout' %}" class="dh-btn-primary w-full text-center block py-3">Proceed to Checkout →</a>
+    <a href="{% url 'store:products' %}" class="block text-center text-sm text-gray-500 mt-3 hover:text-gold">Continue Shopping</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'store/base.html' %}
+
+{% block title %}{{ product.name }} — SK Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <nav class="text-sm text-gray-500 mb-6">
+    <a href="{% url 'store:home' %}" class="hover:text-gold">Home</a> /
+    <a href="{{ product.category.get_absolute_url }}" class="hover:text-gold">{{ product.category.name }}</a> /
+    <span class="text-charcoal">{{ product.name }}</span>
+  </nav>
+
+  <div class="grid md:grid-cols-2 gap-10">
+    <div class="relative">
+      {% if product.discount_percent > 0 %}
+      <span class="dh-discount-badge">-{{ product.discount_percent }}%</span>
+      {% endif %}
+      {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full rounded-2xl border border-gray-100 object-cover">
+      {% else %}
+      <div class="w-full aspect-square rounded-2xl bg-cream flex items-center justify-center text-6xl">📦</div>
+      {% endif %}
+    </div>
+
+    <div>
+      <h1 class="text-3xl font-bold text-charcoal">{{ product.name }}</h1>
+      <div class="dh-stars mt-2 text-lg" aria-label="{{ product.rating }} out of 5 stars">
+        {% for i in "12345" %}{% if forloop.counter <= product.rating %}★{% else %}☆{% endif %}{% endfor %}
+        <span class="text-sm text-gray-400 ml-1">({{ product.rating }})</span>
+      </div>
+
+      <div class="mt-4 flex items-baseline gap-3">
+        <span class="text-3xl font-extrabold text-charcoal">${{ product.price }}</span>
+        {% if product.discount_price and product.discount_price > product.price %}
+        <span class="text-lg text-gray-400 line-through">${{ product.discount_price }}</span>
+        {% endif %}
+      </div>
+
+      <p class="mt-5 text-gray-600 leading-relaxed">{{ product.description|default:"No description provided yet for this product." }}</p>
+
+      <p class="mt-4 text-sm {% if product.in_stock %}text-green-600{% else %}text-red-500{% endif %} font-medium">
+        {% if product.in_stock %}✔ In Stock ({{ product.stock }} available){% else %}✘ Out of Stock{% endif %}
+      </p>
+
+      <div class="mt-6 flex items-center gap-3">
+        <form action="{% url 'store:cart_add' product.id %}" method="post" class="flex items-center gap-3 flex-1">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="dh-input w-20 text-center">
+          <button type="submit" class="dh-btn-primary flex-1 py-3" {% if not product.in_stock %}disabled{% endif %}>
+            {% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
+          </button>
+        </form>
+        <form action="{% url 'store:wishlist_toggle' product.id %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit"
+                  class="dh-wishlist-btn dh-wishlist-btn--static {% if product.id in WISHLIST_PRODUCT_IDS %}dh-wishlist-btn--active{% endif %}"
+                  title="{% if product.id in WISHLIST_PRODUCT_IDS %}Remove from wishlist{% else %}Add to wishlist{% endif %}"
+                  aria-label="Toggle wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="{% if product.id in WISHLIST_PRODUCT_IDS %}currentColor{% else %}none{% endif %}">
+              <path d="M12 20s-7-4.3-9.3-8.7C1.2 8 3 5 6.4 5c2 0 3.4 1.1 4.1 2.3.7 -1.2 2.1-2.3 4.1-2.3 3.4 0 5.2 3 4.7 6.3C20.5 15.7 12 20 12 20z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="mt-8 grid grid-cols-3 gap-3 text-xs text-gray-500">
+        <span>🚚 Free Shipping On Orders $50+</span>
+        <span>↩️ 30 Days Returns</span>
+        <span>🔒 Secure Payment</span>
+      </div>
+    </div>
+  </div>
+
+  {% if related_products %}
+  <section class="mt-14">
+    <h2 class="text-xl font-bold text-charcoal mb-6">You Might Also Like</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {% for product in related_products %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

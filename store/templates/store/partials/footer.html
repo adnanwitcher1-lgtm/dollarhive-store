@@ -1,0 +1,65 @@
+<footer class="bg-charcoal text-gray-300 mt-16">
+  <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+
+    <div class="lg:col-span-2">
+      <div class="text-xl font-extrabold mb-3">
+        <span class="text-white">SK</span><span class="text-gold"> Mart</span>
+      </div>
+      <p class="text-sm text-gray-400 leading-relaxed max-w-xs">
+        Top quality products at dollar prices. We help you shop smart and
+        save more on thousands of products across every category.
+      </p>
+      <div class="flex items-center gap-3 mt-5">
+        <a href="#" class="dh-social" aria-label="Facebook">f</a>
+        <a href="#" class="dh-social" aria-label="Instagram">ig</a>
+        <a href="#" class="dh-social" aria-label="X / Twitter">x</a>
+        <a href="#" class="dh-social" aria-label="YouTube">yt</a>
+        {% if MERCHANT_WHATSAPP_LINK %}
+        <a href="{{ MERCHANT_WHATSAPP_LINK }}" target="_blank" rel="noopener" class="dh-social dh-social--whatsapp" aria-label="WhatsApp">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.39 1.26 4.81L2 22l5.44-1.35a9.9 9.9 0 0 0 4.6 1.13h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.06h-.01a8.15 8.15 0 0 1-4.16-1.14l-.3-.18-3.06.76.82-2.98-.2-.31a8.1 8.1 0 0 1-1.25-4.3c0-4.5 3.66-8.16 8.17-8.16 2.18 0 4.23.85 5.77 2.4a8.1 8.1 0 0 1 2.39 5.77c0 4.5-3.67 8.14-8.17 8.14Z"/></svg>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div>
+      <h6 class="text-white font-semibold mb-4">Quick Links</h6>
+      <ul class="space-y-2 text-sm">
+        <li><a href="{% url 'store:home' %}" class="dh-footer-link">Home</a></li>
+        <li><a href="{% url 'store:products' %}" class="dh-footer-link">Shop</a></li>
+        <li><a href="{% url 'store:deals' %}" class="dh-footer-link">Deals</a></li>
+        <li><a href="{% url 'store:track_order' %}" class="dh-footer-link">Track Order</a></li>
+        <li><a href="{% url 'store:about' %}" class="dh-footer-link">About Us</a></li>
+        <li><a href="{% url 'store:contact' %}" class="dh-footer-link">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h6 class="text-white font-semibold mb-4">Product Categories</h6>
+      <ul class="space-y-2 text-sm">
+        {% for cat in NAV_CATEGORIES %}
+        <li><a href="{{ cat.get_absolute_url }}" class="dh-footer-link">{{ cat.name }}</a></li>
+        {% empty %}
+        <li class="text-gray-500">Coming soon</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div>
+      <h6 class="text-white font-semibold mb-4">Newsletter Signup</h6>
+      <p class="text-sm text-gray-400 mb-3">Get deal alerts before everyone else.</p>
+      <form class="flex" onsubmit="return false;">
+        <input type="email" required placeholder="Your email"
+               class="flex-1 min-w-0 rounded-l-md px-3 py-2 text-sm text-charcoal focus:outline-none">
+        <button class="dh-btn-primary rounded-r-md rounded-l-none px-4 text-sm">Join</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-4 text-xs text-gray-500 flex flex-col sm:flex-row justify-between gap-2">
+      <span>© {% now "Y" %} SK Mart All rights reserved.</span>
+      <span>Smart Deals. More Savings.</span>
+    </div>
+  </div>
+</footer>

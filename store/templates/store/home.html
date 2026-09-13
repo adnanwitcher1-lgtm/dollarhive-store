@@ -1,0 +1,216 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ============ HERO BANNER ============ -->
+<!-- <section class="dh-hero">
+  <div class="max-w-7xl mx-auto px-4 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 items-center">
+
+    <div>
+      <span class="dh-flame-badge">🔥 Big Savings, Every Day</span>
+      <h1 class="mt-5 text-4xl sm:text-5xl font-extrabold leading-tight text-charcoal">
+        Top Quality Products at <span class="text-gold">Dollar Prices</span>
+      </h1>
+      <p class="mt-5 text-gray-600 text-lg max-w-md">
+        Shop smart and save more on thousands of products across all categories.
+      </p>
+
+      <div class="mt-8 flex flex-wrap gap-4">
+        <a href="{% url 'store:products' %}" class="dh-btn-primary text-base px-7 py-3">Shop Now →</a>
+        <a href="{% url 'store:deals' %}" class="dh-btn-outline text-base px-7 py-3">View Deals</a>
+      </div>
+
+      <div class="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-gray-600">
+        <span class="flex items-center gap-2">🚚 Free Shipping On Orders $50+</span>
+        <span class="flex items-center gap-2">↩️ 30 Days Returns Hassle Free</span>
+        <span class="flex items-center gap-2">🔒 Secure Payment 100% Secure</span>
+      </div>
+    </div>
+
+    <div class="relative flex justify-center">
+      <div class="dh-hero-art">
+        <span class="dh-hero-emoji dh-hero-emoji--cart">🛒</span>
+        <span class="dh-hero-emoji dh-hero-emoji--box">📦</span>
+        <span class="dh-hero-emoji dh-hero-emoji--headphones">🎧</span>
+        <span class="dh-hero-emoji dh-hero-emoji--watch">⌚</span>
+        <span class="dh-hero-emoji dh-hero-emoji--bottle">🧴</span>
+        <div class="dh-promo-badge">
+          <span class="text-xs font-semibold leading-none">SAVE UP TO</span>
+          <span class="text-2xl font-extrabold leading-none">70%</span>
+          <span class="text-xs font-semibold leading-none">OFF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+
+<section class="dh-hero relative overflow-hidden bg-[#FBF7EE] border-b border-[#EDE6D6]">
+  <!-- Warm Ambient Glows behind background -->
+  <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#EAD8B1]/40 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-0 -left-20 w-80 h-80 bg-[#E5D0AC]/30 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-4 py-14 lg:py-24 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+
+    <!-- Left Content Column -->
+    <div>
+      <span class="dh-flame-badge inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFE3C8] text-[#8C5E14] text-sm font-semibold border border-[#E3D1A8]/60 shadow-sm">
+        🔥 Big Savings, Every Day
+      </span>
+
+      <h1 class="mt-5 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-[#2D2A26]">
+        Top Quality Products at <span class="text-gold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500">Dollar Prices</span>
+      </h1>
+
+      <p class="mt-5 text-[#5A544B] text-lg max-w-md leading-relaxed font-medium">
+        Shop smart and save more on thousands of premium products across all categories.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="mt-8 flex flex-wrap gap-4">
+        <a href="{% url 'store:products' %}" class="dh-btn-primary shadow-lg shadow-amber-600/20 hover:shadow-xl transition-all duration-300 text-base px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white">
+          Shop Now 
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+        <a href="{% url 'store:deals' %}" class="dh-btn-outline bg-[#F4ECD8] hover:bg-[#EAE0C7] text-[#3D372E] transition-all text-base px-8 py-3.5 rounded-xl font-bold border border-[#DDD0B3]">
+          View Deals
+        </a>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="mt-10 pt-6 border-t border-[#E8DFC9] flex flex-wrap gap-x-6 gap-y-3 text-xs sm:text-sm font-semibold text-[#5A544B]">
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Free Shipping $50+
+        </span>
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          30 Days Free Returns
+        </span>
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          100% Secure Checkout
+        </span>
+      </div>
+    </div>
+
+    <!-- Right Hero Image Column -->
+    <div class="relative flex justify-center items-center">
+      
+      <!-- Decorative Backdrop Glow for Dark Cream Theme -->
+      <div class="absolute w-72 h-72 sm:w-96 sm:h-96 bg-gradient-to-tr from-[#EAD8B1] to-[#D8B066] rounded-full filter blur-2xl opacity-50 animate-pulse"></div>
+
+      <div class="relative w-full max-w-lg">
+        
+        <!-- Big Showcase Image -->
+        <img 
+          src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop" 
+          alt="Featured Products Showcase" 
+          class="w-full h-auto object-contain rounded-3xl drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
+        />
+
+        <!-- Floating Discount Badge -->
+        <div class="dh-promo-badge absolute -top-4 -right-2 sm:right-2 bg-gradient-to-br from-red-500 to-amber-600 text-white p-4 rounded-2xl shadow-xl border border-white/30 flex flex-col items-center justify-center animate-bounce">
+          <span class="text-[10px] font-bold tracking-wider uppercase">SAVE UP TO</span>
+          <span class="text-3xl font-black leading-none my-0.5">70%</span>
+          <span class="text-[10px] font-bold tracking-wider uppercase">OFF</span>
+        </div>
+
+        <!-- Dynamic Floating Flash Sale Card -->
+        <div class="absolute -bottom-6 -left-4 sm:left-0 bg-[#FFFDF9]/95 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-[#EBE1CD] flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#F5EAD2] flex items-center justify-center text-amber-700 font-bold">
+            ⚡
+          </div>
+          <div>
+            <p class="text-xs text-[#7A7265] font-medium">Flash Sale Ending</p>
+            <p id="flash-sale-timer" class="text-sm font-bold text-[#2D2A26]">Loading...</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ VALUE PROPOSITION BAR ============ -->
+<section class="dh-reveal max-w-7xl mx-auto px-4 py-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+  <div class="dh-value-card">
+    <span class="dh-value-icon">💰</span>
+    <h3 class="font-semibold text-charcoal">Great Prices</h3>
+    <p class="text-sm text-gray-500 mt-1">Best prices on the market</p>
+  </div>
+  <div class="dh-value-card">
+    <span class="dh-value-icon">✅</span>
+    <h3 class="font-semibold text-charcoal">Trusted Quality</h3>
+    <p class="text-sm text-gray-500 mt-1">Quality products you can trust</p>
+  </div>
+  <div class="dh-value-card">
+    <span class="dh-value-icon">🏷️</span>
+    <h3 class="font-semibold text-charcoal">Exclusive Deals</h3>
+    <p class="text-sm text-gray-500 mt-1">Deals you won't find anywhere else</p>
+  </div>
+  <div class="dh-value-card">
+    <span class="dh-value-icon">🎧</span>
+    <h3 class="font-semibold text-charcoal">Customer Support</h3>
+    <p class="text-sm text-gray-500 mt-1">We're here to help 24/7</p>
+  </div>
+</section>
+
+<!-- ============ SHOP BY CATEGORY ============ -->
+<section class="dh-reveal max-w-7xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-charcoal">Shop by Category</h2>
+    <a href="{% url 'store:products' %}" class="text-sm font-medium text-gold hover:underline">View All Categories →</a>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+    {% for cat in categories %}
+    <a href="{{ cat.get_absolute_url }}" class="dh-category-card">
+      {% if cat.image %}
+      <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="w-12 h-12 object-cover rounded-full mb-2">
+      {% else %}
+      <span class="dh-category-fallback">{{ cat.name|slice:":1" }}</span>
+      {% endif %}
+      <span class="text-sm font-medium text-charcoal text-center">{{ cat.name }}</span>
+    </a>
+    {% empty %}
+    <p class="col-span-full text-gray-400 text-sm">Categories will appear here once added in the admin panel.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ============ FEATURED / DEALS PRODUCT GRID ============ -->
+<section class="dh-reveal max-w-7xl mx-auto px-4 py-10">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-charcoal">Today's Top Deals</h2>
+    <a href="{% url 'store:deals' %}" class="text-sm font-medium text-gold hover:underline">See All Deals →</a>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for product in deal_products %}
+      {% include 'store/partials/product_card.html' with product=product %}
+    {% empty %}
+    <p class="col-span-full text-gray-400 text-sm">No deals live right now — check back soon!</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="dh-reveal max-w-7xl mx-auto px-4 py-10">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-charcoal">New Arrivals</h2>
+    <a href="{% url 'store:new_arrivals' %}" class="text-sm font-medium text-gold hover:underline">See All →</a>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for product in new_arrivals %}
+      {% include 'store/partials/product_card.html' with product=product %}
+    {% empty %}
+    <p class="col-span-full text-gray-400 text-sm">New products will show up here.</p>
+    {% endfor %}
+  </div>
+</section>
+
+
+
+
+
+{% endblock %}

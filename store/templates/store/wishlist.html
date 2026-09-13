@@ -1,0 +1,23 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Your Wishlist — SK Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <h1 class="text-2xl font-bold text-charcoal mb-6">Your Wishlist</h1>
+
+  {% if wishlist|length == 0 %}
+  <div class="text-center py-16">
+    <p class="text-5xl mb-4">💛</p>
+    <p class="text-gray-500 mb-6">Your wishlist is empty — tap the heart on any product to save it here.</p>
+    <a href="{% url 'store:products' %}" class="dh-btn-primary px-6 py-3">Start Shopping →</a>
+  </div>
+  {% else %}
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for product in wishlist %}
+      {% include 'store/partials/product_card.html' with product=product %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+
+# Django
+db.sqlite3
+staticfiles/
+# NOTE: media/ is intentionally NOT ignored — the seed product/category
+# images ship with the repo so the demo store isn't empty on first deploy.
+
+# Env
+.env
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

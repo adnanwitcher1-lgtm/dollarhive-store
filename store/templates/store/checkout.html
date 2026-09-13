@@ -1,0 +1,77 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Checkout — SK Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <h1 class="text-2xl font-bold text-charcoal mb-8">Checkout</h1>
+
+  <div class="grid lg:grid-cols-3 gap-10">
+    <!-- Shipping / contact form -->
+    <form method="post" class="lg:col-span-2 space-y-5">
+      {% csrf_token %}
+
+      <div class="dh-form-section">
+        <h2 class="font-semibold text-charcoal mb-4">Contact Information</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="dh-label">Full Name *</label>
+            <input type="text" name="customer_name" required class="dh-input w-full">
+          </div>
+          <div>
+            <label class="dh-label">Email Address *</label>
+            <input type="email" name="customer_email" required class="dh-input w-full">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="dh-label">Phone Number (WhatsApp) *</label>
+            <input type="tel" name="customer_phone" required placeholder="+92 300 1234567" class="dh-input w-full">
+            <p class="text-xs text-gray-400 mt-1">Include your country code — we'll send your order receipt here via WhatsApp.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dh-form-section">
+        <h2 class="font-semibold text-charcoal mb-4">Shipping Address</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="dh-label">Street Address *</label>
+            <input type="text" name="shipping_address" required class="dh-input w-full">
+          </div>
+          <div>
+            <label class="dh-label">City</label>
+            <input type="text" name="shipping_city" class="dh-input w-full">
+          </div>
+          <div>
+            <label class="dh-label">Country</label>
+            <input type="text" name="shipping_country" class="dh-input w-full">
+          </div>
+        </div>
+      </div>
+
+      <div class="dh-form-section">
+        <h2 class="font-semibold text-charcoal mb-4">Payment</h2>
+        <p class="text-sm text-gray-500">Cash on Delivery — pay when your order arrives. (Wire this section up to a real payment gateway, e.g. Stripe, for production use.)</p>
+      </div>
+
+      <button type="submit" class="dh-btn-primary w-full py-3 text-base">Place Order →</button>
+    </form>
+
+    <!-- Order summary -->
+    <div class="dh-form-section h-fit">
+      <h2 class="font-semibold text-charcoal mb-4">Order Summary</h2>
+      <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
+        {% for item in cart %}
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">{{ item.quantity }} × {{ item.product.name }}</span>
+          <span class="text-charcoal font-medium">${{ item.line_total }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="border-t border-gray-100 mt-4 pt-4 flex justify-between text-lg font-bold text-charcoal">
+        <span>Total</span>
+        <span>${{ cart.total_price }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
