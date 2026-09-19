@@ -41,10 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
 
-    # Must come BEFORE django.contrib.staticfiles for the storage
-    # backend override below to take effect correctly.
-    'cloudinary_storage',
+    # staticfiles listed BEFORE cloudinary_storage on purpose: Django
+    # picks whichever app's management command comes first when two
+    # apps define the same command name. We only use Cloudinary for
+    # MEDIA (not static), so we want Django/WhiteNoise's normal
+    # collectstatic to run, not cloudinary_storage's override — which
+    # was breaking the admin static files build.
     'django.contrib.staticfiles',
+    'cloudinary_storage',
     'cloudinary',
 
     # DollarHive storefront app
