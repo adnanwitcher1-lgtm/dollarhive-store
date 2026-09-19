@@ -117,6 +117,13 @@ STORAGES = {
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 
+# django-cloudinary-storage's own `collectstatic` override still reads
+# the OLD (pre-Django 4.2) STATICFILES_STORAGE setting directly, and
+# defining STORAGES above makes Django drop that old setting — which
+# was crashing the Render build with "no attribute STATICFILES_STORAGE".
+# Keeping this line fixes that, purely for that package's compatibility.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
