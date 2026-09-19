@@ -13,8 +13,6 @@ from dotenv import load_dotenv
 # ----------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Loads a local .env file if present (for local development only —
-# Render provides real env vars directly, no .env file needed there).
 load_dotenv(BASE_DIR / '.env')
 
 # ----------------------------------------------------------------------
@@ -25,15 +23,11 @@ SECRET_KEY = os.environ.get(
     'dev-only-secret-key-change-me-before-deploying'
 )
 
-# DEBUG defaults to False. Set DJANGO_DEBUG=True in a local .env for
-# development only — never enable this in production.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
-# Comma-separated list via env, e.g. "dollarhive.onrender.com,dollarhive.com"
 _allowed = os.environ.get('DJANGO_ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()] or ['*']
 
-# Needed so Render's HTTPS domain is trusted for POST forms (checkout, admin login).
 _csrf_origins = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '')
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(',') if o.strip()]
 
@@ -46,7 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+
+    # Must come BEFORE django.contrib.staticfiles for the storage
+    # backend override below to take effect correctly.
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
 
     # DollarHive storefront app
     'store',
@@ -68,8 +67,6 @@ ROOT_URLCONF = 'dollarhive.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # Project-level templates dir is optional; app templates are
-        # auto-discovered from store/templates/ because APP_DIRS is True.
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -78,8 +75,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # Makes {{ CART_ITEM_COUNT }} available on every page
-                # (see store/context_processors.py) for the header badge.
                 'store.context_processors.cart_item_count',
             ],
         },
@@ -88,12 +83,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dollarhive.wsgi.application'
 
-# ----------------------------------------------------------------------
-# Database — SQLite for local dev. If DATABASE_URL is set (Render's
-# Postgres add-on sets this automatically), use that instead, because
-# Render's own filesystem is wiped on every redeploy — SQLite data
-# would not survive there.
-# ----------------------------------------------------------------------
 import dj_database_url
 
 DATABASES = {
@@ -103,9 +92,6 @@ DATABASES = {
     )
 }
 
-# ----------------------------------------------------------------------
-# Password validation
-# ----------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -113,9 +99,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ----------------------------------------------------------------------
-# Internationalization
-# ----------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -128,49 +111,52 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'store' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STORAGES = {
-    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    # Uploaded media (product/category images) now lives on Cloudinary
+    # instead of Render's ephemeral local disk — survives redeploys.
+    'default': {'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage'},
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# 👉 Free account: https://cloudinary.com/users/register/free
+#    Dashboard shows Cloud Name / API Key / API Secret — put them in
+#    Render's environment variables (never hardcode here).
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+}
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ----------------------------------------------------------------------
 # Email settings — customer & merchant order notifications
 # ----------------------------------------------------------------------
-# 👉 Set these via environment variables (.env locally, dashboard env
-#    vars on Render) — never hardcode real credentials here.
-#    EMAIL_HOST_USER: your Gmail address
-#    EMAIL_HOST_PASSWORD: a Gmail "App Password" (NOT your normal login
-#    password). Get one here (after turning on 2-Step Verification):
-#    https://myaccount.google.com/apppasswords
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+# Without this, a slow/blocked SMTP connection hangs forever and gunicorn
+# kills the whole worker on timeout — this was crashing /checkout/ with
+# a 500. 10s is plenty for Gmail SMTP.
+EMAIL_TIMEOUT = 10
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# 👉 The inbox that should receive "new order" alerts.
 MERCHANT_EMAIL = os.environ.get('MERCHANT_EMAIL', EMAIL_HOST_USER)
 
 # ----------------------------------------------------------------------
 # WhatsApp notification settings (Twilio WhatsApp Business API)
 # ----------------------------------------------------------------------
-# Create a free Twilio account, enable the WhatsApp Sandbox (or a
-# verified WhatsApp Business sender), and fill these in via
-# environment variables. See store/notifications.py for usage.
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
-TWILIO_WHATSAPP_FROM = os.environ.get('TWILIO_WHATSAPP_FROM', 'whatsapp:+14155238886')  # Twilio sandbox number
+TWILIO_WHATSAPP_FROM = os.environ.get('TWILIO_WHATSAPP_FROM', 'whatsapp:+14155238886')
 MERCHANT_WHATSAPP_NUMBER = os.environ.get('MERCHANT_WHATSAPP_NUMBER', 'whatsapp:+10000000000')
 
-# If True, notification failures are swallowed & logged instead of
-# breaking checkout for the customer. Recommended: True in production.
 NOTIFICATIONS_FAIL_SILENTLY = os.environ.get('NOTIFICATIONS_FAIL_SILENTLY', 'True') == 'True'
 
 LOGIN_REDIRECT_URL = 'store:home'
