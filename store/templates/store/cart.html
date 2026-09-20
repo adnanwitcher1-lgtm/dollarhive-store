@@ -24,7 +24,7 @@
         {% endif %}
         <div>
           <a href="{{ item.product.get_absolute_url }}" class="font-semibold text-charcoal hover:text-gold">{{ item.product.name }}</a>
-          <p class="text-sm text-gray-500">${{ item.product.price }} each</p>
+          <p class="text-sm text-gray-500">Rs {{ item.product.price }} each</p>
         </div>
       </div>
 
@@ -33,7 +33,7 @@
         <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="dh-input w-16 text-center" onchange="this.form.submit()">
       </form>
 
-      <span class="font-semibold text-charcoal w-20 text-right">${{ item.line_total }}</span>
+      <span class="font-semibold text-charcoal w-20 text-right">Rs {{ item.line_total }}</span>
 
       <form action="{% url 'store:cart_remove' item.product.id %}" method="post">
         {% csrf_token %}
@@ -46,11 +46,11 @@
   <div class="dh-cart-summary mt-8 ml-auto">
     <div class="flex justify-between text-gray-500 text-sm mb-2">
       <span>Subtotal ({{ cart.total_quantity }} items)</span>
-      <span>${{ cart.total_price }}</span>
+      <span>Rs {{ cart.total_price }}</span>
     </div>
     <div class="flex justify-between text-xl font-bold text-charcoal mb-5">
       <span>Total</span>
-      <span>${{ cart.total_price }}</span>
+      <span>Rs {{ cart.total_price }}</span>
     </div>
     <a href="{% url 'store:checkout' %}" class="dh-btn-primary w-full text-center block py-3">Proceed to Checkout →</a>
     <a href="{% url 'store:products' %}" class="block text-center text-sm text-gray-500 mt-3 hover:text-gold">Continue Shopping</a>
