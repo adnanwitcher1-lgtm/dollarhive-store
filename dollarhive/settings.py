@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cloudinary_storage',
     'cloudinary',
+    'anymail',
 
     # DollarHive storefront app
     'store',
@@ -115,25 +116,15 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'store' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STORAGES = {
-    # Uploaded media (product/category images) now lives on Cloudinary
-    # instead of Render's ephemeral local disk — survives redeploys.
     'default': {'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage'},
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 
-# django-cloudinary-storage's own `collectstatic` override still reads
-# the OLD (pre-Django 4.2) STATICFILES_STORAGE setting directly, and
-# defining STORAGES above makes Django drop that old setting — which
-# was crashing the Render build with "no attribute STATICFILES_STORAGE".
-# Keeping this line fixes that, purely for that package's compatibility.
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# 👉 Free account: https://cloudinary.com/users/register/free
-#    Dashboard shows Cloud Name / API Key / API Secret — put them in
-#    Render's environment variables (never hardcode here).
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
@@ -143,22 +134,23 @@ CLOUDINARY_STORAGE = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ----------------------------------------------------------------------
-# Email settings — customer & merchant order notifications
+# Email settings — customer & merchant order notifications (via Resend,
+# HTTP API — no more SMTP socket hangs/gunicorn crashes)
 # ----------------------------------------------------------------------
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-# Without this, a slow/blocked SMTP connection hangs forever and gunicorn
-# kills the whole worker on timeout — this was crashing /checkout/ with
-# a 500. 10s is plenty for Gmail SMTP.
-EMAIL_TIMEOUT = 10
+EMAIL_BACKEND = 'anymail.backends.resend.EmailBackend'
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+ANYMAIL = {
+    'RESEND_API_KEY': os.environ.get('RESEND_API_KEY', ''),
+}
 
-MERCHANT_EMAIL = os.environ.get('MERCHANT_EMAIL', EMAIL_HOST_USER)
+# 👉 DEFAULT_FROM_EMAIL must be an address on a domain verified in
+#    Resend — e.g. orders@yourdomain.com. For quick testing without a
+#    verified domain, use onboarding@resend.dev (only delivers to your
+#    own Resend account email).
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '')
+
+# 👉 The inbox that should receive "new order" alerts.
+MERCHANT_EMAIL = os.environ.get('MERCHANT_EMAIL', DEFAULT_FROM_EMAIL)
 
 # ----------------------------------------------------------------------
 # WhatsApp notification settings (Twilio WhatsApp Business API)
