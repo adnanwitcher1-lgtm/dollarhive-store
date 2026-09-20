@@ -4,9 +4,9 @@ Thanks for shopping with SK Mart — Smart Deals. More Savings. 🐝
 
 Your order #{{ order.pk }} is confirmed:
 
-{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} @ ${{ item.price }} = ${{ item.line_total }}
+{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} @ Rs {{ item.price }} = Rs {{ item.line_total }}
 {% endfor %}
-Order Total: ${{ order.order_total }}
+Order Total: Rs {{ order.order_total }}
 
 Shipping to:
 {{ order.customer_name }}
