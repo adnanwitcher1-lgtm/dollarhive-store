@@ -37,9 +37,9 @@
     </div>
 
     <div class="mt-2 flex items-baseline gap-2">
-      <span class="text-lg font-bold text-charcoal">${{ product.price }}</span>
+      <span class="text-lg font-bold text-charcoal">Rs {{ product.price }}</span>
       {% if product.discount_price and product.discount_price > product.price %}
-      <span class="text-sm text-gray-400 line-through">${{ product.discount_price }}</span>
+      <span class="text-sm text-gray-400 line-through">Rs {{ product.discount_price }}</span>
       {% endif %}
     </div>
 
