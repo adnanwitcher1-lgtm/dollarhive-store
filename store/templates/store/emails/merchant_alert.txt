@@ -12,8 +12,8 @@ Ship to:
 {{ order.shipping_city }}, {{ order.shipping_country }}
 
 Items:
-{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} @ ${{ item.price }} = ${{ item.line_total }}
+{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} @ Rs {{ item.price }} = Rs {{ item.line_total }}
 {% endfor %}
-Order Total: ${{ order.order_total }}
+Order Total: Rs {{ order.order_total }}
 
 Log in to the admin panel to process this order.
