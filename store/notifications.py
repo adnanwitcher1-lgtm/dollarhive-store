@@ -20,6 +20,7 @@ If Twilio isn't configured (e.g. in local dev), WhatsApp sending is
 skipped gracefully and logged instead of raising.
 """
 import logging
+import threading
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -42,15 +43,25 @@ def send_customer_confirmation_email(order):
     })
 
     try:
-        send_mail(
+        sent_count = send_mail(
             subject=subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[order.customer_email],
             fail_silently=settings.NOTIFICATIONS_FAIL_SILENTLY,
         )
-        logger.info('Customer confirmation email sent for order #%s', order.pk)
-        return True
+        # send_mail() with fail_silently=True does NOT raise on failure —
+        # it just returns 0. Without checking this, a failed send was
+        # being logged (and treated) as a success.
+        if sent_count:
+            logger.info('Customer confirmation email sent for order #%s', order.pk)
+            return True
+        logger.warning(
+            'Customer confirmation email NOT sent for order #%s (send_mail returned 0 — '
+            'check EMAIL_HOST_USER/EMAIL_HOST_PASSWORD env vars on Render)',
+            order.pk,
+        )
+        return False
     except Exception:
         logger.exception('Failed to send customer confirmation email for order #%s', order.pk)
         if not settings.NOTIFICATIONS_FAIL_SILENTLY:
@@ -66,21 +77,28 @@ def send_merchant_alert_email(order):
     Emails the store administrator (settings.MERCHANT_EMAIL) the moment
     a new order comes in, so it can be picked, packed, and shipped.
     """
-    subject = f'🛎️ New SK Mart order #{order.pk} — ${order.order_total}'
+    subject = f'🛎️ New SK Mart order #{order.pk} — Rs {order.order_total}'
     message = render_to_string('store/emails/merchant_alert.txt', {
         'order': order,
     })
 
     try:
-        send_mail(
+        sent_count = send_mail(
             subject=subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[settings.MERCHANT_EMAIL],
             fail_silently=settings.NOTIFICATIONS_FAIL_SILENTLY,
         )
-        logger.info('Merchant alert email sent for order #%s', order.pk)
-        return True
+        if sent_count:
+            logger.info('Merchant alert email sent for order #%s', order.pk)
+            return True
+        logger.warning(
+            'Merchant alert email NOT sent for order #%s (send_mail returned 0 — '
+            'check EMAIL_HOST_USER/EMAIL_HOST_PASSWORD env vars on Render)',
+            order.pk,
+        )
+        return False
     except Exception:
         logger.exception('Failed to send merchant alert email for order #%s', order.pk)
         if not settings.NOTIFICATIONS_FAIL_SILENTLY:
@@ -144,21 +162,21 @@ def send_whatsapp_order_notifications(order):
         return False, False
 
     item_lines = '\n'.join(
-        f'• {item.quantity} x {item.product_name} — ${item.line_total}'
+        f'• {item.quantity} x {item.product_name} — Rs {item.line_total}'
         for item in order.items.all()
     )
 
     customer_body = (
         f'Hi {order.customer_name}, thanks for shopping with SK Mart! 🐝\n\n'
         f'Order #{order.pk} confirmed:\n{item_lines}\n\n'
-        f'Total: ${order.order_total}\n'
+        f'Total: Rs {order.order_total}\n'
         f'We will text you again once it ships. Track anytime at SK Mart > Track Order.'
     )
     merchant_body = (
         f'🔔 New SK Mart order #{order.pk}\n'
         f'Customer: {order.customer_name} ({order.customer_phone})\n'
         f'{item_lines}\n\n'
-        f'Total: ${order.order_total}'
+        f'Total: Rs {order.order_total}'
     )
 
     customer_sent = _send_whatsapp_message(client, order.customer_phone, customer_body)
@@ -175,11 +193,11 @@ def send_whatsapp_order_notifications(order):
 # ----------------------------------------------------------------------
 # Single entry point called from views.checkout()
 # ----------------------------------------------------------------------
-def notify_new_order(order):
+def _notify_new_order_sync(order):
     """
-    Fires all checkout notification triggers for a freshly placed
-    order: customer email, merchant email, and WhatsApp receipts.
-    Call this once, right after the Order + OrderItems are saved.
+    The actual work: fires all checkout notification triggers for a
+    freshly placed order (customer email, merchant email, WhatsApp).
+    Runs on a background thread — see notify_new_order() below.
     """
     customer_email_sent = send_customer_confirmation_email(order)
     merchant_email_sent = send_merchant_alert_email(order)
@@ -195,3 +213,23 @@ def notify_new_order(order):
         'whatsapp_customer_sent': whatsapp_customer_sent,
         'whatsapp_merchant_sent': whatsapp_merchant_sent,
     }
+
+
+def notify_new_order(order):
+    """
+    Call this once, right after the Order + OrderItems are saved.
+
+    Runs email + WhatsApp sending on a background thread so a slow or
+    blocked SMTP/Twilio connection can NEVER hang or crash the
+    customer's checkout request — the order is already saved in the
+    database at this point, so the customer should always get their
+    "order placed" page regardless of whether the notification side
+    succeeds. (EMAIL_TIMEOUT in settings.py caps how long the SMTP
+    connection attempt itself can hang.)
+    """
+    thread = threading.Thread(
+        target=_notify_new_order_sync,
+        args=(order,),
+        daemon=True,
+    )
+    thread.start()
