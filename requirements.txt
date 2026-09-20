@@ -8,3 +8,4 @@ psycopg2-binary>=2.9
 python-dotenv>=1.0
 django-cloudinary-storage>=0.3
 cloudinary>=1.36
+django-anymail[resend]>=11.0
