@@ -17,13 +17,13 @@
       {% for item in order.items.all %}
       <div class="flex justify-between text-sm">
         <span class="text-gray-600">{{ item.quantity }} × {{ item.product_name }}</span>
-        <span class="text-charcoal font-medium">${{ item.line_total }}</span>
+        <span class="text-charcoal font-medium">Rs {{ item.line_total }}</span>
       </div>
       {% endfor %}
     </div>
     <div class="border-t border-gray-100 pt-4 flex justify-between text-lg font-bold text-charcoal">
       <span>Total</span>
-      <span>${{ order.order_total }}</span>
+      <span>Rs {{ order.order_total }}</span>
     </div>
   </div>
 
