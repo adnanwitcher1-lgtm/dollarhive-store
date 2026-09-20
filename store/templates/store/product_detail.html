@@ -30,9 +30,9 @@
       </div>
 
       <div class="mt-4 flex items-baseline gap-3">
-        <span class="text-3xl font-extrabold text-charcoal">${{ product.price }}</span>
+        <span class="text-3xl font-extrabold text-charcoal">Rs {{ product.price }}</span>
         {% if product.discount_price and product.discount_price > product.price %}
-        <span class="text-lg text-gray-400 line-through">${{ product.discount_price }}</span>
+        <span class="text-lg text-gray-400 line-through">Rs {{ product.discount_price }}</span>
         {% endif %}
       </div>
 
@@ -66,7 +66,7 @@
       </div>
 
       <div class="mt-8 grid grid-cols-3 gap-3 text-xs text-gray-500">
-        <span>🚚 Free Shipping On Orders $50+</span>
+        <span>🚚 Free Shipping On Orders Rs 5,000+</span>
         <span>↩️ 30 Days Returns</span>
         <span>🔒 Secure Payment</span>
       </div>
