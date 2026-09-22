@@ -79,6 +79,15 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+
+        # Auto-correct: `discount_price` must always be the HIGHER
+        # ("was") price and `price` the LOWER ("now") price for the
+        # frontend badge/strikethrough to show. If someone enters
+        # discount_price as a smaller sale price by mistake, swap the
+        # two so it still displays correctly — no frontend change needed.
+        if self.discount_price is not None and self.discount_price < self.price:
+            self.price, self.discount_price = self.discount_price, self.price
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
